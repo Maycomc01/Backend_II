@@ -1,0 +1,7 @@
+{{#if userData}}
+<a class="nav-link" href="/profile">Perfil</a>
+<a class="nav-link" href="/api/sessions/logout">Logout</a>
+{{#if (isAdmin userData.role)}}
+<a class="nav-link" href="/admin/create-product">Agregar producto</a>
+{{/if}}
+{{/if}}

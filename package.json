@@ -1,0 +1,31 @@
+{
+  "name": "backend-ii-entrega1",
+  "version": "1.0.0",
+  "description": "CRUD de usuarios con autenticación y autorización - Backend II",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-mongo": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-handlebars": "^8.0.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.23.0",
+    "mongoose-paginate-v2": "^1.9.1",
+    "multer": "^2.0.2",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "session-file-store": "^1.5.0",
+    "socket.io": "^4.8.3"
+  }
+}

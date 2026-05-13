@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="{{styles.products}}">
+<h1 class="products-title">Productos de la tienda</h1>
+
+{{#each pagination.docs}}
+{{#if this.status}}
+<div class="product-card">
+  <h3>{{this.title}}</h3>
+  <h5>{{this.description}}</h5>
+  <p class="price">${{this.price}}</p>
+  <p class="stock">Stock: {{this.stock}}</p>
+  <div class="thumbnails">
+    {{#each this.thumbnails}}
+    <img src="{{this}}" alt="{{title}}">
+    {{/each}}
+  </div>
+</div>
+{{/if}}
+{{/each}}
+
+<div class="pagination">
+  {{#if pagination.prevPage}}
+  <a class="btn btn-outline" href="/products?page={{pagination.prevPage}}">← Página {{pagination.prevPage}}</a>
+  {{/if}}
+  {{#if pagination.nextPage}}
+  <a class="btn btn-outline" href="/products?page={{pagination.nextPage}}">Página {{pagination.nextPage}} →</a>
+  {{/if}}
+</div>

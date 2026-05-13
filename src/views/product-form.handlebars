@@ -1,0 +1,30 @@
+<div class="card">
+    <h1 class="card-title">Agregar Producto</h1>
+    <form action="/api/products" method="post" enctype="multipart/form-data">
+        <label for="">Titulo
+            <input type="text" name="title">
+        </label>
+        <label for="">Descripcion
+            <input type="text" name="description">
+        </label>
+        <label for="">Precio $
+            <input type="number" name="price">
+        </label>
+        <label for="">Categoría
+            <input type="text" name="category">
+        </label>
+        <label for="">Stock
+            <input type="number" name="stock">
+        </label>
+        <label for="">Disponible
+            <input type="checkbox" name="status" checked>
+        </label>
+        <label for="">Código
+            <input type="text" name="code">
+        </label>
+        <label for="">Imagen
+            <input type="file" name="thumbnails">
+        </label>
+        <button class="btn">Agregar producto</button>
+    </form>
+</div>

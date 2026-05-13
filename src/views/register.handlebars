@@ -1,0 +1,25 @@
+<div class="card">
+    <h1 class="card-title">Formulario de Registro</h1>
+    <form action="/api/sessions/register" method="post">
+        <label for="first_name">Nombre:
+            <input type="text" id="first_name" name="first_name" required>
+        </label>
+        <label for="last_name">Apellido:
+            <input type="text" id="last_name" name="last_name" required>
+        </label>
+        <label for="email">Correo Electrónico:
+            <input type="email" id="email" name="email" required>
+        </label>
+        <label for="age">Edad:
+            <input type="number" id="age" name="age" required>
+        </label>
+        <label for="password">Contraseña:
+            <input type="password" id="password" name="password" required>
+        </label>
+        <button class="btn" type="submit">Registrarse</button>
+    </form>
+    <div class="auth-links">
+        <a class="btn btn-outline" href="/api/sessions/github-login">Iniciar sesión con GitHub</a>
+        <a class="btn btn-outline" href="/api/sessions/google">Iniciar sesión con Google</a>
+    </div>
+</div>

@@ -1,8 +1,18 @@
 import { Router } from "express";
-import { productModel } from "../model/productModel.js";
+import { ProductRepository } from "../repositories/product.repository.js";
 import { ensureAdmin } from "../middlewares/auth.middlewares.js";
 import passport from "passport";
+
 const router = Router();
+const productRepository = new ProductRepository();
+
+router.get("/forgot-password", (req, res) => {
+    res.render("forgot-password", {
+        styles: {
+            main: "/css/main.css"
+        }
+    });
+});
 
 router.get("/register", (req, res) => {
     res.render("register", {
@@ -28,7 +38,7 @@ router.use(passport.authenticate("jwt", {
 router.get("/products", async (req, res) => {
     try {
         const { page = 1 } = req.query;
-        const pagination = await productModel.paginate({}, {
+        const pagination = await productRepository.getPaginated({}, {
             limit: 10,
             page: page,
             lean: true

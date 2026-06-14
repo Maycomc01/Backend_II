@@ -3,7 +3,7 @@ import { dirname } from "path";
 import multer from "multer";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { env } from "process";
+import { env } from "./config/env.js";
 
 const filename = fileURLToPath(import.meta.url);
 export const __dirname = dirname(filename);
@@ -27,8 +27,8 @@ export function validatePassword(password, hashedPassword) {
     return bcrypt.compareSync(password, hashedPassword);
 }
 
-export function generateToken(user) {
-    return jwt.sign(user, env.JWT_SECRET, { expiresIn: "1h" });
+export function generateToken(user, expiresIn = "1h") {
+    return jwt.sign(user, env.JWT_SECRET, { expiresIn });
 }
 
 export function verifyToken(token) {

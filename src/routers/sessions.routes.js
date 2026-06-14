@@ -1,7 +1,12 @@
 import { Router, json, urlencoded } from "express";
 import passport from "passport";
-import { generateToken } from "../utils.js";
+import { generateToken, verifyToken, hashPassword, validatePassword } from "../utils.js";
+import { UserRepository } from "../repositories/user.repository.js";
+import { getUserDTO } from "../dto/user.dto.js";
+import { sendResetPasswordEmail } from "../services/mailing.service.js";
 import { sessionsErrorHandler } from "../middlewares/auth.middlewares.js"
+
+const userRepository = new UserRepository();
 
 const router = Router();
 
@@ -106,7 +111,8 @@ router.get("/current",
     passport.authenticate("current", { session: false }),
     async (req, res, next) => {
         try {
-            res.status(200).json({ user: req.user });
+            const userDTO = getUserDTO(req.user);
+            res.status(200).json({ user: userDTO });
         } catch (error) {
             next(error);
         }
@@ -117,7 +123,8 @@ router.get("/current-user",
     passport.authenticate("current", { session: false }),
     async (req, res, next) => {
         try {
-            res.status(200).json({ user: req.user });
+            const userDTO = getUserDTO(req.user);
+            res.status(200).json({ user: userDTO });
         } catch (error) {
             next(error);
         }
@@ -144,6 +151,75 @@ router.post("/set-cookie",
         }
     }
 );
+
+router.post("/forgot-password", async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: "Email es requerido" });
+
+        const user = await userRepository.getByEmail(email);
+        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+        const resetToken = generateToken({ email: user.email }, "1h");
+        await sendResetPasswordEmail(email, resetToken);
+
+        res.status(200).json({ message: "Correo de recuperación enviado" });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get("/reset-password/:token", async (req, res, next) => {
+    try {
+        const { token } = req.params;
+        const decoded = verifyToken(token);
+        if (!decoded || !decoded.email) {
+            return res.status(400).render("session-failed", {
+                styles: { main: "/css/main.css" },
+                error: "Token inválido o expirado"
+            });
+        }
+        res.status(200).render("reset-password", {
+            styles: { main: "/css/main.css" },
+            token
+        });
+    } catch (error) {
+        res.status(400).render("session-failed", {
+            styles: { main: "/css/main.css" },
+            error: "Token inválido o expirado"
+        });
+    }
+});
+
+router.post("/reset-password/:token", async (req, res, next) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        if (!password || password.length < 10) {
+            return res.status(400).json({ error: "La contraseña debe tener al menos 10 caracteres" });
+        }
+
+        const decoded = verifyToken(token);
+        if (!decoded || !decoded.email) {
+            return res.status(400).json({ error: "Token inválido o expirado" });
+        }
+
+        const user = await userRepository.getByEmail(decoded.email);
+        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+        if (validatePassword(password, user.password)) {
+            return res.status(400).json({ error: "La nueva contraseña no puede ser igual a la anterior" });
+        }
+
+        user.password = hashPassword(password);
+        await user.save();
+
+        res.status(200).json({ message: "Contraseña restablecida exitosamente" });
+    } catch (error) {
+        next(error);
+    }
+});
 
 router.use(sessionsErrorHandler);
 

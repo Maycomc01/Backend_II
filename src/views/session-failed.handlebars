@@ -1,5 +1,9 @@
 <div class="card error-page">
     <h1 class="card-title">Error</h1>
+    {{#if error}}
+    <p>{{error}}</p>
+    {{else}}
     <p>Fallo al registrar o iniciar sesión.</p>
+    {{/if}}
     <a class="btn" href="/login">Volver a intentar</a>
 </div>

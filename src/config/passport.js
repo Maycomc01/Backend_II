@@ -1,13 +1,15 @@
 import passport from "passport";
 import { validatePassword, cookieExtractor } from "../utils.js";
-import { userModel } from "../model/usersModel.js";
-import { cartModel } from "../model/cartModel.js";
+import { UserRepository } from "../repositories/user.repository.js";
+import { CartRepository } from "../repositories/cart.repository.js";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GithubStrategy } from "passport-github2";
 import { Strategy as JWTSTrategy, ExtractJwt } from "passport-jwt";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { env } from "./env.js";
 
+const userRepository = new UserRepository();
+const cartRepository = new CartRepository();
 
 export function initializePassport() {
 
@@ -58,10 +60,10 @@ const jwtConfig = {
 async function registerCallback(req, username, password, done) {
     try {
         const user = req.body;
-        const userExists = await userModel.findOne({ email: username });
+        const userExists = await userRepository.getByEmail(username);
         if (userExists == null) {
-            const cart = await cartModel.create({});
-            const newUser = await userModel.create({ ...user, cart: cart._id });
+            const cart = await cartRepository.create();
+            const newUser = await userRepository.create({ ...user, cart: cart._id });
             return done(null, newUser);
         } else {
             console.log("usuario ya existente")
@@ -74,7 +76,7 @@ async function registerCallback(req, username, password, done) {
 
 async function loginCallback(username, password, done) {
     try {
-        const user = await userModel.findOne({ email: username });
+        const user = await userRepository.getByEmail(username);
         if (user == null) {
             return done(null, false)
         }
@@ -95,12 +97,12 @@ async function githubCallback(accesToken, refreshToken, profile, done) {
     if (userData.email == null) {
         userData.email = userData.id + "@github.com";
     }
-    const user = await userModel.findOne({ email: userData.email });
+    const user = await userRepository.getByEmail(userData.email);
     if (user) {
         return done(null, user);
     } else {
-        const cart = await cartModel.create({});
-        const user = await userModel.create({
+        const cart = await cartRepository.create();
+        const user = await userRepository.create({
             first_name: userData.login || userData.name || userData.email.split("@")[0],
             last_name: userData.name || userData.login || userData.email.split("@")[0],
             email: userData.email,
@@ -114,12 +116,12 @@ async function githubCallback(accesToken, refreshToken, profile, done) {
 
 async function googleCallback(accesToken, refreshToken, profile, done) {
     const { _json: userData } = profile;
-    const user = await userModel.findOne({ email: userData.email });
+    const user = await userRepository.getByEmail(userData.email);
     if (user) {
         return done(null, user);
     } else {
-        const cart = await cartModel.create({});
-        const user = await userModel.create({
+        const cart = await cartRepository.create();
+        const user = await userRepository.create({
             first_name: userData.given_name || userData.email.split("@")[0],
             last_name: userData.family_name || userData.given_name || userData.email.split("@")[0],
             email: userData.email,
